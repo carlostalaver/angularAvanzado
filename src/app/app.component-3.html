@@ -7,7 +7,7 @@
     </app-tab>
 
     <app-tab title="Crono">Vista CRONO no disponible</app-tab>
-    
+
     <app-tab title="Alarm">Vista ALARM no disponible</app-tab>
   </app-tabs>
 
@@ -18,7 +18,7 @@
     </div>
 
     <label>Set the number of seconds for your timer</label>
-    <input [(ngModel)]="time" type="number">
+    <input [(ngModel)]="time" type="number" #timeInput>
 
     <div botones>
       <!-- Proyecta en el ng-content con select="[botones]" -->
@@ -26,20 +26,5 @@
       <button (click)="submitAddTimer()">Ok</button>
     </div>
   </app-alert-view>
-
-  <app-alert-view [hidden]="!isEndTimerAlertVisible">
-    <div hola>
-      <!-- Proyecta en el ng-content con select="[hola]" -->
-      Temporizador finalizado
-    </div>
-
-    <div>Tu contador finalizó</div>
-
-    <div botones>
-      <!-- Proyecta en el ng-content con select="[botones]" -->
-      <button (click)="hideEndTimerAlert()" class="cancel-button">Cancel</button>
-    </div>
-  </app-alert-view>
-
-  <app-simple-alert-view></app-simple-alert-view>
+<ng-container #alertDinamico></ng-container>
 </div>

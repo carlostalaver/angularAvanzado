@@ -11,6 +11,7 @@ import { AlertViewComponent } from './alert-view/alert-view.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { TabComponent } from './tab/tab.component';
 import { SimpleAlertViewComponent } from './simple-alert-view/simple-alert-view.component';
+import { TimerService } from './timer/timer.service';
 
 
 
@@ -23,13 +24,14 @@ import { SimpleAlertViewComponent } from './simple-alert-view/simple-alert-view.
     AlertViewComponent,
     TabsComponent,
     TabComponent,
-    SimpleAlertViewComponent
+    SimpleAlertViewComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule
   ],
+  entryComponents:[SimpleAlertViewComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

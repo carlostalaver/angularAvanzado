@@ -1,4 +1,4 @@
-export interface Tab{
+export interface ITab {
     isActive:boolean;
     title:string;
 }
