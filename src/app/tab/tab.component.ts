@@ -11,11 +11,11 @@ import { TabsComponent } from 'app/tabs/tabs.component';
 export class TabComponent implements OnInit, ITab {
 
   @Input() title: string;
+  @Output() eventoClick: EventEmitter<void> = new EventEmitter<void>();
   public isActive: boolean = false;
 
-  @Output() eventoClick: EventEmitter<void> = new EventEmitter<void>();
 
-  //#region para trabajar con dependencia de inyecciones, accediendo desde el HIJO al Padre
+  //#region para trabajar con dependencia de inyecciones, accediendo desde el HIJO al PADRE
   /* Inyecto una referencia del componente padre o contenedor 
   constructor(public componentPadre: TabsComponent) { }
   */

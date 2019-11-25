@@ -1,4 +1,4 @@
-import { Component, OnInit, ContentChild, AfterContentInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ContentChildren, AfterContentInit, OnDestroy, QueryList } from '@angular/core';
 import { TabComponent } from "app/tab/tab.component";
 import { ITab } from 'app/tab/Itab.interface';
 import { Subscription } from 'rxjs/Subscription';
@@ -11,46 +11,40 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class TabsComponent implements OnInit, AfterContentInit, OnDestroy {
 
-  /* OJO:  el array tabs lo cargo desde el componente hijo, ver tab.component.ts metodo ngOnInit() */
-  public tabs:ITab[] = []; 
-
   /*Accediendo desde el componente padre al componente hijo */
-  @ContentChild(TabComponent) tabHijo: TabComponent;/* tabHijo toma la referencia al primer elemento <app-tab> PROYECTADO (con <ng-content>)
-                                                    en la vista del componente TabsComponent, asi que pudiera acceder a sus propiedades y metodos si lo quisiera*/
-  eventoClickSubscripcion: Subscription =  null;
+  @ContentChildren(TabComponent) public tabs: QueryList<TabComponent>;/* tabs toma las referencias de los elementos <app-tab> PROYECTADO (con <ng-content>)
+                                                                   en la vista del componente TabsComponent, asi que pudiera acceder a sus propiedades y metodos si lo quisiera*/
+  eventoClickSubscripcions: Subscription[] = [];
 
   constructor() { }
 
   ngOnInit() {
-    
+
   }
 
-  addTab(tab:ITab){
-    if (this.tabs.length === 0) {
-      tab.isActive = true;
-    }
-    this.tabs.push(tab);
-  }
-
-  selectTab(tab:ITab) {
-    for (let tab of this.tabs){
+  selectTab(tab: ITab) {
+    this.tabs.forEach(tab => {
       tab.isActive = false;
-    }
+    });
     tab.isActive = true;
   }
-  
+
   ngAfterContentInit(): void {
-    if(this.tabHijo){
-      this.addTab(this.tabHijo);
-      this.eventoClickSubscripcion = this.tabHijo.eventoClick.subscribe(() => {
-        console.warn('El elemento ha sido clickeado..!');        
+    this.tabs.forEach((tab, index) => {
+
+      this.eventoClickSubscripcions[index] = tab.eventoClick.subscribe(() => {
+        console.log(`Clieck en ${tab.title}`);
       })
-    }
+      //this.eventoClickSubscripcions.push(subscripcion)
+    });
+    this.selectTab(this.tabs.first);
   }
 
   ngOnDestroy(): void {
-    if (this.eventoClickSubscripcion) {
-      this.eventoClickSubscripcion.unsubscribe();
+    if (this.eventoClickSubscripcions.length) {
+      this.eventoClickSubscripcions.forEach(evento => {
+        evento.unsubscribe();
+      })
     }
   }
 

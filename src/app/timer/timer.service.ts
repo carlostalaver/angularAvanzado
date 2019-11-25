@@ -4,9 +4,10 @@ import { BehaviorSubject }  from 'rxjs/BehaviorSubject'
 
 @Injectable()
 export class TimerService {
-  private countdownTimerRef:any = null;
-  paused: boolean = true;
+
   public init: number = 0;
+  private countdownTimerRef: any = null;
+  public paused: boolean = true;
 
   private countDownEndSource = new Subject<void>();
   public countDownEnd$ = this.countDownEndSource.asObservable();
@@ -18,7 +19,7 @@ export class TimerService {
 
 
   destroyPersonalizado():void{
-    this.clearTimeout();
+    this.limpiarTimeout();
   }
 
   restartCountdown(initArg?){
@@ -27,8 +28,8 @@ export class TimerService {
     }
     if(this.init && this.init > 0){
       this.paused = true;
-      this.clearTimeout();
-      this.countDownSource.next(this.init)
+      this.limpiarTimeout();
+      this.countDownSource.next(this.init);
     }
   }
 
@@ -38,19 +39,19 @@ export class TimerService {
     if(!this.paused){
       this.doCountdown();
     } else {
-      this.clearTimeout();
+      this.limpiarTimeout();
     }
   }
 
   private doCountdown(){
     this.countdownTimerRef = setTimeout(()=>{
-      this.countDownSource.next(this.countDownSource.getValue() -1)
+      this.countDownSource.next(this.countDownSource.getValue() - 1)
       this.processCountdown();
     }, 1000);
   }
 
   private processCountdown(){
-    if(this.countDownSource.getValue() <= 0){
+    if(this.countDownSource.getValue() === 0){
       this.countDownEndSource.next();
     }
     else{
@@ -58,7 +59,7 @@ export class TimerService {
     }
   }
 
-  private clearTimeout(){
+  private limpiarTimeout(){
     if(this.countdownTimerRef){
       clearTimeout(this.countdownTimerRef);
       this.countdownTimerRef = null;

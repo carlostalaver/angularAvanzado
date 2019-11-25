@@ -8,45 +8,42 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./timer.component.scss'],
   providers: [TimerService],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.Emulated 
+  encapsulation: ViewEncapsulation.Emulated
 })
 export class TimerComponent implements OnInit, OnDestroy {
 
-
-  @Output() onComplete = new EventEmitter<void>();
   @Input() init: number = 20;
+  @Output() onComplete = new EventEmitter<void>();
   private countDonwEndSubscription: Subscription = null;
   private countDonwSubscription: Subscription = null;
   valorInicial: number = 0;
 
-
-
-  constructor(public timerService: TimerService, private changeDetectorRef: ChangeDetectorRef) {
-   
-   }
+  constructor(public timerService: TimerService, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.timerService.restartCountdown(this.init)
+    
+    this.countDonwSubscription = this.timerService.countdown$.subscribe(value => {
+      this.valorInicial = value;
+      this.changeDetectorRef.markForCheck();
+    })
 
-    this.countDonwEndSubscription =  this.timerService.countDownEnd$.subscribe( () => {
+    this.countDonwEndSubscription = this.timerService.countDownEnd$.subscribe(() => {
       console.warn('contador en cero --Desde el Timer.companent.ts--');
       this.onComplete.emit();
     })
 
-    this.countDonwSubscription = this.timerService.countdown$.subscribe( value => {
-      this.valorInicial = value;
-      this.changeDetectorRef.markForCheck();
-    }) 
   }
 
   ngOnDestroy(): void {
     // destroy del timer
+    console.warn('DESTRUYENDO EL COMPONENTE TIMER');    
     this.timerService.destroyPersonalizado();
     this.countDonwEndSubscription.unsubscribe();
     this.countDonwSubscription.unsubscribe();
   }
 
   get progress() {
-    return (this.init - this.valorInicial)/this.init * 100;
+    return (this.init - this.valorInicial) / this.init * 100;
   }
 }

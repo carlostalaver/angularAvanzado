@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild, AfterContentInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, AfterContentInit, ViewChildren, QueryList, AfterViewInit, ViewChild, ChangeDetectorRef, ElementRef, Renderer2 } from '@angular/core';
 import { SimpleAlertViewComponent } from './simple-alert-view/simple-alert-view.component';
 
 @Component({
@@ -6,21 +6,20 @@ import { SimpleAlertViewComponent } from './simple-alert-view/simple-alert-view.
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterContentInit {
+export class AppComponent implements AfterContentInit, AfterViewInit {
 
   isAddTimerVisible: boolean = false;
   time: number = 0;
   timers: Array<number> = [];
-
  
   @Output() onSubmit = new EventEmitter<number>(); 
-  isEndTimerAlertVisible: boolean = false;
 
   alertTitle: string = 'Mi titulo';
 
-  @ViewChild(SimpleAlertViewComponent) alert: SimpleAlertViewComponent;
+  @ViewChildren(SimpleAlertViewComponent) alerts: QueryList<SimpleAlertViewComponent>;
+  @ViewChild("timeInput") timeInput : ElementRef;
 
-  constructor(public cdRef: ChangeDetectorRef) {
+  constructor(public cdRef: ChangeDetectorRef, private renderer: Renderer2) {
     this.timers = [3, 20, 185]
   }
 
@@ -30,6 +29,13 @@ export class AppComponent implements AfterContentInit {
   
   showAddTimer() {
     this.isAddTimerVisible = true;
+    /* lo meto en un setTimeout para que angular se pueda dar cuenta de que this.timeInput.nativeElement cambió, ojo notar que la estrategia de deteccion de cambios es default;
+       esto corre porque al tocar directamente el DOM angular no se enterará que algo cambió y ChangeDetectorRef no funciona para detectar
+       cambios en el DOM, solo queda usar el setTimeout 
+    */
+    setTimeout(() => {
+      this.renderer.selectRootElement(this.timeInput.nativeElement).focus()
+    });
   }
 
   hideAddTimer() {
@@ -37,11 +43,8 @@ export class AppComponent implements AfterContentInit {
   }
 
   showEndTimerAlert() {
-    this.isEndTimerAlertVisible = true;
-  }
-
-  hideEndTimerAlert() {
-    this.isEndTimerAlertVisible = false;
+    //TODO mostar alerta
+    this.alerts.first.show();
   }
 
   submitAddTimer(){
@@ -50,21 +53,23 @@ export class AppComponent implements AfterContentInit {
   }
 
   ngAfterContentInit(): void {
-    console.warn('El @ViewChind es ', this.alert);
-    this.alert.show();
-    this.alert.title = 'Este es el titulo'; 
-    this.alert.message = 'Este es el mensaje enviado desde app.component.ts en vez del app.component.html'
-    //this.cdRef.detectChanges();
+    /*las QueryList no se pueden procesar en este ciclo de vida */
   }
 
-/*  this.cdRef.detectChanges(); lo pude haber usado para decirle a angular que detecte los cambios, si la necesidad de 
-    implementar el metodo ngAfterContectInit()
   ngAfterViewInit(): void {
-    console.warn('El @ViewChind es ', this.alert);
-    this.alert.show();
-    this.alert.title = 'Este es el titulo'; 
-    this.alert.message = 'Este es el mensaje enviado desde app.component.ts en vez del app.component.html'
-    this.cdRef.detectChanges();
-  } */
-}
+    console.warn(this.alerts);
+    this.renderer.setAttribute(this.timeInput.nativeElement,"placeholder","Por favor introducir los segundos");
+    this.renderer.addClass(this.timeInput.nativeElement,"time-in");
+    
+    this.alerts.forEach(alert => {
+      if(!alert.title){
+          alert.title =  "Hola desde el app.component.ts";
+          alert.message = "Hola 2 desde el app.component.ts"
+      }
+    });
+    this.cdRef.detectChanges(); /* eso this.cdRef.detectChanges() porq this.alerts de tipo QueryList NO ESTARÁ disponible en ciclo de vida
+    ngAfterContentInit, Ojo esto sucede porque estoy trabajando con @ViewChildren lo que me retorna un QueryList, si fuera @ViewChild si 
+    estaria disponible en el ciclo de vida indicado */
+  }
 
+}

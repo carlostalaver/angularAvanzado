@@ -44,3 +44,5 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 Archivos
 app.componentCON@viewChild-1.ts y app.componentCON@viewChild-1.html
+
+app.componet.ts Ng-template-NgContainer-2

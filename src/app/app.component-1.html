@@ -1,4 +1,4 @@
-<div>
+<div id="idApp">
 
   <app-tabs>
     <app-tab title="Timers">
@@ -11,14 +11,14 @@
     <app-tab title="Alarm">Vista ALARM no disponible</app-tab>
   </app-tabs>
 
-  <app-alert-view [hidden]="!isAddTimerVisible">
+  <app-alert-view [hidden]="!isAddTimerVisible" #alert1>
     <div hola>
       <!-- Proyecta en el ng-content con select="[hola]" -->
-      Mi titulo proyectado en ng.content con select=".header"
+      Mi titulo proyectado en ng.content en alert-view.component.html con select="[hola]"
     </div>
 
     <label>Set the number of seconds for your timer</label>
-    <input [(ngModel)]="time" type="number" #timeInput>
+    <input [(ngModel)]="time" type="number">
 
     <div botones>
       <!-- Proyecta en el ng-content con select="[botones]" -->
@@ -27,13 +27,19 @@
     </div>
   </app-alert-view>
 
+  <app-alert-view [hidden]="!isEndTimerAlertVisible">
+    <div hola>
+      <!-- Proyecta en el ng-content con select="[hola]" -->
+      Temporizador finalizado
+    </div>
 
-  <ng-template #pantillaEndTemporizador let-message let-title="title">
-    <app-simple-alert-view [title]="title" [message]="message">
-    </app-simple-alert-view>
-  </ng-template>
+    <div>Tu contador finalizó</div>
 
-  <ng-container [ngTemplateOutlet]="pantillaEndTemporizador"
-   [ngTemplateOutletContext]="{title:'Valor para el titulo', $implicit:'valor para el mensaje'}">
-  </ng-container>
+    <div botones>
+      <!-- Proyecta en el ng-content con select="[botones]" -->
+      <button (click)="hideEndTimerAlert()" class="cancel-button">Cancel</button>
+    </div>
+  </app-alert-view>
+
+  <app-simple-alert-view></app-simple-alert-view>
 </div>
