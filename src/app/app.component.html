@@ -1,5 +1,4 @@
 <div>
-
   <app-tabs>
     <app-tab title="Timers">
       <app-timer *ngFor="let timer of timers" [init]="timer" (onComplete)="showEndTimerAlert()"></app-timer>
@@ -26,14 +25,6 @@
       <button (click)="submitAddTimer()">Ok</button>
     </div>
   </app-alert-view>
-
-
-  <ng-template #pantillaEndTemporizador let-message let-title="title">
-    <app-simple-alert-view [title]="title" [message]="message">
-    </app-simple-alert-view>
-  </ng-template>
-
-  <ng-container [ngTemplateOutlet]="pantillaEndTemporizador"
-   [ngTemplateOutletContext]="{title:'Valor para el titulo', $implicit:'valor para el mensaje'}">
-  </ng-container>
+  <!-- En #alertDinamico es donde pintaré el componente de manera dinamica -->
+  <ng-container #alertDinamico></ng-container>
 </div>

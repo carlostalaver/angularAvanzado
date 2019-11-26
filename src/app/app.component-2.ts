@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, AfterContentInit, AfterViewInit, ViewChild, ElementRef, Renderer2, ViewContainerRef, ComponentFactoryResolver, ComponentRef } from '@angular/core';
+import { Component, Output, EventEmitter, AfterContentInit, ViewChildren, QueryList, AfterViewInit, ViewChild, ChangeDetectorRef, ElementRef, Renderer2 } from '@angular/core';
 import { SimpleAlertViewComponent } from './simple-alert-view/simple-alert-view.component';
 
 @Component({
@@ -11,23 +11,22 @@ export class AppComponent implements AfterContentInit, AfterViewInit {
   isAddTimerVisible: boolean = false;
   time: number = 0;
   timers: Array<number> = [];
-
-  @Output() onSubmit = new EventEmitter<number>();
+ 
+  @Output() onSubmit = new EventEmitter<number>(); 
 
   alertTitle: string = 'Mi titulo';
 
-  @ViewChild("timeInput") timeInput: ElementRef;
-  @ViewChild("alertDinamico", { read: ViewContainerRef }) alertDinamico: ViewContainerRef;
-  simpleAlert: ComponentRef<SimpleAlertViewComponent> = null;
+  @ViewChildren(SimpleAlertViewComponent) alerts: QueryList<SimpleAlertViewComponent>;
+  @ViewChild("timeInput") timeInput : ElementRef;
 
-  constructor(private renderer: Renderer2, private resolver: ComponentFactoryResolver) {
+  constructor(public cdRef: ChangeDetectorRef, private renderer: Renderer2) {
     this.timers = [3, 20, 185]
   }
 
   logCountDownEnd() {
     console.warn('El contador finalizó --Desde el app.component.ts--!!!');
   }
-
+  
   showAddTimer() {
     this.isAddTimerVisible = true;
     /* lo meto en un setTimeout para que angular se pueda dar cuenta de que this.timeInput.nativeElement cambió, 
@@ -46,30 +45,32 @@ export class AppComponent implements AfterContentInit, AfterViewInit {
 
   showEndTimerAlert() {
     //TODO mostar alerta
-    const alertDinamicoFactory = this.resolver.resolveComponentFactory(SimpleAlertViewComponent);
-    this.simpleAlert = this.alertDinamico.createComponent(alertDinamicoFactory);
-    this.simpleAlert.instance.title = "Titulo dado desde la creación dinamíca del componente";
-    this.simpleAlert.instance.message = "Mensaje dado desde la creación dinamíca del componente";
-    this.simpleAlert.instance.cerrarAlerta
-      .subscribe(() => {
-        this.simpleAlert.destroy();
-        console.log('Cerrando la ventana de alerta..!!!');
-
-      })
-    this.simpleAlert.instance.show();
+    this.alerts.first.show();
   }
 
-  submitAddTimer() {
+  submitAddTimer(){
     this.timers.push(this.time);
     this.hideAddTimer();
   }
 
   ngAfterContentInit(): void {
-
+    /*las QueryList no se pueden procesar en este ciclo de vida */
   }
 
   ngAfterViewInit(): void {
-
+    console.warn(this.alerts);
+    this.renderer.setAttribute(this.timeInput.nativeElement,"placeholder","Por favor introducir los segundos");
+    this.renderer.addClass(this.timeInput.nativeElement,"time-in");
+    
+    this.alerts.forEach(alert => {
+      if(!alert.title){
+          alert.title =  "Hola desde el app.component.ts";
+          alert.message = "Hola 2 desde el app.component.ts"
+      }
+    });
+    this.cdRef.detectChanges(); /* eso this.cdRef.detectChanges() porq this.alerts de tipo QueryList NO ESTARÁ disponible en ciclo de vida
+    ngAfterContentInit, Ojo esto sucede porque estoy trabajando con @ViewChildren lo que me retorna un QueryList, si fuera @ViewChild si 
+    estaria disponible en el ciclo de vida indicado */
   }
 
 }
